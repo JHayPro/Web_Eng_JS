@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Jude Hayes Lab 1</title>
+        <style>
+            body {background-color: lightsalmon;}
+            #counter{
+            display: flex;
+            flex-wrap: nowrap;
+            }
+        </style>
+        <script>//Declaring member variables for JS
+            var usernameText, passwordText, studentIDText, messageText;
+            var studentIDError, usernameError;
+            var submitButton, submissionBox;
+            var messageTempString, messageWordCount,messageSuccess;
+            var validUsername = false, validPassword = false, validStudentID = false;
+ 
+            function usernameCallback() {//called to verify username at submission time
+                validUsername = false;
+                if (usernameText.value.length > 0) {//checks if the input is blank otherwise display an error
+                    usernameError = document.getElementById("usernameErrorEmpty");
+                    usernameError.style.display = 'none';
+            
+                    for (var i = 0; i < usernameText.value.length; i++) {//checks if any non A-z characters are included in the input
+                        if (usernameText.value[i] < 'A' || usernameText.value[i] > 'z') {
+                            usernameError = document.getElementById("usernameErrorChar");
+                            usernameError.style.display = 'contents';
+                            validUsername = false;
+                            break;
+                        } else {//if no invalid inputs are found the username is valid
+                            usernameError = document.getElementById("usernameErrorChar");
+                            usernameError.style.display = 'none';
+                            validUsername = true;
+                        }
+                    }
+                } else {
+                    usernameError = document.getElementById("usernameErrorChar");
+                    usernameError.style.display = 'none';
+                    usernameError = document.getElementById("usernameErrorEmpty");
+                    usernameError.style.display = 'contents';
+                }
+            
+            }
+            
+            function passwordCallback() {//called to verify password at submission time
+                validPassword = false;
+                
+                if (passwordText.value.length > 0) {//checks that there is a input, otherwise display an error
+                    passwordError = document.getElementById("passwordErrorEmpty");
+                    passwordError.style.display = 'none';
+                    var number = false;
+            
+                    for (var i = 0; i < passwordText.value.length; i++) {//checks if the password containts a number, otherwise display an error
+                        if (passwordText.value[i] >= '0' && passwordText.value[i] <= '9') {
+                            passwordError = document.getElementById("passwordErrorNum");
+                            passwordError.style.display = 'none';
+                            number = true;
+                            break;
+                        } else {
+                            passwordError = document.getElementById("passwordErrorNum");
+                            passwordError.style.display = 'contents';
+                        }
+                    }
+                    var uppercase = false;
+                    for (var i = 0; i < passwordText.value.length; i++) {//checks if there is an uppercase char, otherwise display an error
+                        if (passwordText.value[i] >= 'A' && passwordText.value[i] <= 'Z') {
+                            passwordError = document.getElementById("passwordErrorCase");
+                            passwordError.style.display = 'none';
+                            uppercase = true;
+                            break;
+                        } else {
+                            passwordError = document.getElementById("passwordErrorCase");
+                            passwordError.style.display = 'contents';
+                        }
+                    }
+                    if (uppercase) {
+                        for (var i = 0; i < passwordText.value.length; i++) {//check if there is a lower case char, otherwise display an error
+                            if (passwordText.value[i] >= 'a' && passwordText.value[i] <= 'z') {
+                                passwordError = document.getElementById("passwordErrorCase");
+                                passwordError.style.display = 'none';
+                                if(number)
+                                    validPassword = true;//if all conditions are met the password is set to valid
+                                break;
+                            } else {
+                                passwordError = document.getElementById("passwordErrorCase");
+                                passwordError.style.display = 'contents';
+                                validPassword = false;
+                            }
+                        }
+                    }
+            
+                } else {
+                    passwordError = document.getElementById("passwordErrorEmpty");
+                    passwordError.style.display = 'contents';
+                    passwordError = document.getElementById("passwordErrorNum");
+                    passwordError.style.display = 'none';
+                    passwordError = document.getElementById("passwordErrorCase");
+                    passwordError.style.display = 'none';
+                }
+            }
+            
+            function studentIdCallback() {//check if the student ID is valid
+                validStudentID = false;
+                if (studentIDText.value.length !== 9) {//checks if the length of the id is 9, otherwise display an error
+                    studentIDError = document.getElementById("studentIDErrorCount");
+                    studentIDError.style.display = 'contents';
+                } else {
+                    studentIDError = document.getElementById("studentIDErrorCount");
+                    studentIDError.style.display = 'none';
+                    validStudentID = true;
+                }
+                if (studentIDText.value.length > 0) {
+                    for (var i = 0; i < studentIDText.value.length; i++) {//Checks if the student contains only numbers
+                        if (studentIDText.value[i] < '0' || studentIDText.value[i] > '9') {//if a non int is found, display an error and set valid id to false
+                            studentIDError = document.getElementById("studentIDErrorChar");
+                            studentIDError.style.display = 'contents';
+                            validStudentID = false;
+                            break;
+                        }
+                        else{
+                            studentIDError = document.getElementById("studentIDErrorChar");
+                            studentIDError.style.display = 'none';
+                        }
+                    }
+                } else {
+                    studentIDError = document.getElementById("studentIDErrorChar");
+                    studentIDError.style.display = 'none';
+                }
+            }
+            
+            function messageCallback() {//checks if the message is less than 25 values otherwise it locks the message box, and calculates the word count
+                messageTempString = messageText.value.split(' ');
+                messageWordCount = 0;
+                for (var i = 0; i < messageTempString.length; i++) //find the word count
+                    if (messageTempString[i] !== ' ')
+                        messageWordCount++;
+                var wordCountNumber = document.getElementById("wordCountNumber");
+                wordCountNumber.innerHTML = String(messageWordCount - 1);//displays the word count
+            
+                if (messageWordCount == 26) //locks the message box after 25 words
+                    messageText.disabled = true;
+            }
+            
+            function submitCallback() {//checks all parameters at submission time
+                usernameCallback();//checks if the username is valid
+                passwordCallback();//checks if the password is valid
+                studentIdCallback();//checks if the student ID is valid
+                if(validUsername && validPassword && validStudentID){//if all inputs are valid, display success message
+                    messageSuccess = document.getElementById("successMessage");
+                    messageSuccess.style.display = 'contents';   
+                    document.body.style.backgroundColor = "lightsalmon";
+                }
+                else{//if inputs are invalid, change the backgorund color
+                    messageSuccess = document.getElementById("successMessage");
+                    messageSuccess.style.display = 'none';   
+                    document.body.style.backgroundColor = "lightpink";
+                }
+            }
+            
+            function initFunction() {
+                //sets vars equal to respective input
+                usernameText = document.getElementById('username');
+                passwordText = document.getElementById('password');
+                studentIDText = document.getElementById('studentID');
+                messageText = document.getElementById('message');
+
+                //calls messagecallback when something is typed in the message box
+                messageText.addEventListener('keyup', messageCallback);
+
+                //calls submitCallback when submit button is pressed
+                submitButton = document.getElementById('submit');
+                submitButton.addEventListener('click', submitCallback);
+                submissionBox = document.getElementById('output-message');
+            
+                messageWordCountDisplay = document.getElementById('wordCountNumber'); //used for updating word count
+            }
+            
+            window.addEventListener('load', initFunction);
+            
+        </script>
+    </head>
+    <body>
+        <form>
+            <div id="usernameBox">
+                <label for="username"style="color:Gray;"> Enter Username </label><br>
+                <input type="text" id="username" name="username">
+                <div id = "usernameErrors"style="color:Crimson;"style="display:none;">
+                    <span id="usernameErrorEmpty"style="display:none;">ERROR: No Username Entered</span>
+                    <span id = "usernameErrorChar" style="display:none;"> ERROR: Invalid Characters, Use A-Z Only</span>
+                </div>
+                <br>
+            </div>
+            <div id="passwordBox">
+                <label for="password"style="color:Gray;"> Enter Password </label><br>
+                <input type="password" id="password" name="password">
+                <div id = "passwordErrors"style="color:Crimson;">
+                    <span id = "passwordErrorEmpty"style="display:none;">ERROR: No Password Entered</span>
+                    <span id = "passwordErrorCase" style="display:none;">ERROR: Enter Aleast One Upper And Lower Case Letter<br></span>
+                    <span id = "passwordErrorNum" style="display:none;"> ERROR: Enter Aleast One Number<br></span>
+                </div>
+                <br>
+            </div>
+            <div id="studentIDBox">
+                <label for="studentID"style="color:Gray;"> Enter Student ID </label><br>
+                <input type="text" id="studentID" name="StudentID">
+                <div id="studentIDErrors"style="color:Crimson;">
+                    <span id="studentIDErrorCount"style="display:none;">ERROR: Enter A 9 Digit ID</span>
+                    <span id="studentIDErrorChar"style="display:none;">ERROR: Only Use #0-9</span>
+                </div>
+                <br>
+            </div>
+            <div id="messageBox">
+                <label for="message"style="color:Gray;"> Enter Message </label><br>
+                <textarea id="message" name="message " rows="6" cols="30"></textarea>
+            </div>
+            <div id="counter"style="color:Gray;">
+                <span> Word Count: </span>
+                <span id = "wordCountNumber"> 0 </span>
+                <span>/25</span>
+                <br><br>
+            </div>
+            <div id="submissionBox">
+                <input type="button" id = "submit" value="Submit"><br><br>
+                <div id="output-message"></div>
+            </div>
+            <div style="color:Gray;">
+                <span id = "successMessage" style="display:none;">SUCCESS!</span>
+            </div>
+        </form>
+    </body>
+</html>
